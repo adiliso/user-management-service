@@ -1,9 +1,12 @@
 package com.adil.usermanagementservice.service;
 
+import com.adil.usermanagementservice.domain.entity.UserEntity;
 import com.adil.usermanagementservice.domain.model.dto.request.UserCreateRequest;
+import com.adil.usermanagementservice.domain.model.dto.response.UserResponse;
 import com.adil.usermanagementservice.domain.repository.UserRepository;
 import com.adil.usermanagementservice.exception.EmailAlreadyExistsException;
 import com.adil.usermanagementservice.exception.PhoneAlreadyExistsException;
+import com.adil.usermanagementservice.exception.UserNotFoundException;
 import com.adil.usermanagementservice.mapper.UserMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +44,16 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException(email);
         }
+    }
+
+    public UserResponse getById(Long id) {
+        var user = findById(id);
+
+        return userMapper.toResponse(user);
+    }
+
+    private UserEntity findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }

@@ -2,6 +2,7 @@ package com.adil.usermanagementservice.mapper;
 
 import com.adil.usermanagementservice.domain.entity.UserEntity;
 import com.adil.usermanagementservice.domain.model.dto.request.UserCreateRequest;
+import com.adil.usermanagementservice.domain.model.dto.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -14,4 +15,6 @@ import org.springframework.stereotype.Component;
 public interface UserMapper {
 
     UserEntity toEntity(UserCreateRequest request);
+
+    UserResponse toResponse(UserEntity entity);
 }
