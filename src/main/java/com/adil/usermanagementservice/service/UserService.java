@@ -2,6 +2,7 @@ package com.adil.usermanagementservice.service;
 
 import com.adil.usermanagementservice.domain.entity.UserEntity;
 import com.adil.usermanagementservice.domain.model.dto.request.UserCreateRequest;
+import com.adil.usermanagementservice.domain.model.dto.response.PageResponse;
 import com.adil.usermanagementservice.domain.model.dto.response.UserResponse;
 import com.adil.usermanagementservice.domain.repository.UserRepository;
 import com.adil.usermanagementservice.exception.EmailAlreadyExistsException;
@@ -11,6 +12,8 @@ import com.adil.usermanagementservice.mapper.UserMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,5 +58,19 @@ public class UserService {
     private UserEntity findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public PageResponse<UserResponse> getAll(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        var responses = userRepository.findAll(pageable)
+                .map(userMapper::toResponse);
+
+        return new PageResponse<>(
+                responses.getContent(),
+                pageNumber,
+                pageSize,
+                responses.getTotalElements(),
+                responses.getTotalPages());
     }
 }
