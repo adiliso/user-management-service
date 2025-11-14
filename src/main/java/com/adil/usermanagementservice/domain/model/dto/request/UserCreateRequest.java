@@ -17,7 +17,7 @@ public record UserCreateRequest(
         @NotBlank(message = "Phone is required")
         String phone,
 
-        @Pattern(regexp = "\\+?[0-9]{7,15}", message = "Phone number is invalid")
+        @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Phone number is invalid")
         Role role
 ) {
 }

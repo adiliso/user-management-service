@@ -2,6 +2,7 @@ package com.adil.usermanagementservice.service;
 
 import com.adil.usermanagementservice.domain.entity.UserEntity;
 import com.adil.usermanagementservice.domain.model.dto.request.UserCreateRequest;
+import com.adil.usermanagementservice.domain.model.dto.request.UserUpdateRequest;
 import com.adil.usermanagementservice.domain.model.dto.response.PageResponse;
 import com.adil.usermanagementservice.domain.model.dto.response.UserResponse;
 import com.adil.usermanagementservice.domain.repository.UserRepository;
@@ -72,5 +73,26 @@ public class UserService {
                 pageSize,
                 responses.getTotalElements(),
                 responses.getTotalPages());
+    }
+
+    @Transactional
+    public UserResponse update(Long id, UserUpdateRequest request) {
+        var userEntity = findById(id);
+
+        userMapper.update(userEntity, request);
+
+        return userMapper.toResponse(userEntity);
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        checkUserExists(id);
+        userRepository.deleteById(id);
+    }
+
+    private void checkUserExists(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id);
+        }
     }
 }
