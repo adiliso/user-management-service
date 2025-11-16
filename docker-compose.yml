@@ -1,0 +1,27 @@
+services:
+  db_user:
+    container_name: user_db
+    image: postgres
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  app_user:
+    container_name: user_app
+    image: user-app:0.0.1
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile
+    depends_on:
+      db_user:
+        condition: service_healthy
