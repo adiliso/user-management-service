@@ -8,7 +8,37 @@ spring:
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:user-consumer-group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+    topics:
+      user-created: ${KAFKA_TOPIC_USER_CREATED:user.created}
+      user-updated: ${KAFKA_TOPIC_USER_UPDATED:user.updated}
+      user-deleted: ${KAFKA_TOPIC_USER_DELETED:user.deleted}
+
+  logging:
+    level:
+      root: ${LOG_LEVEL:INFO}
+      com.adil.usermanagementservice: ${LOG_LEVEL:DEBUG}
+      org.springframework.web: DEBUG
+      org.apache.kafka: ${KAFKA_LOG_LEVEL:WARN}
+      org.springframework.kafka: ${KAFKA_LOG_LEVEL:WARN}

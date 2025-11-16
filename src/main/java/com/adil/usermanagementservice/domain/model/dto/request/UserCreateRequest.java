@@ -3,6 +3,7 @@ package com.adil.usermanagementservice.domain.model.dto.request;
 import com.adil.usermanagementservice.domain.model.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record UserCreateRequest(
@@ -14,9 +15,10 @@ public record UserCreateRequest(
         @Email(message = "Email should be valid")
         String email,
 
-        @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Phone number is invalid")
+        @Pattern(regexp = "^\\+?[0-9]{1,15}$", message = "Phone number is invalid")
         String phone,
 
+        @NotNull(message = "Role is required")
         Role role
 ) {
 }

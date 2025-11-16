@@ -9,15 +9,18 @@ import com.adil.usermanagementservice.domain.repository.UserRepository;
 import com.adil.usermanagementservice.exception.EmailAlreadyExistsException;
 import com.adil.usermanagementservice.exception.PhoneAlreadyExistsException;
 import com.adil.usermanagementservice.exception.UserNotFoundException;
+import com.adil.usermanagementservice.kafka.producer.UserProducer;
 import com.adil.usermanagementservice.mapper.UserMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     UserRepository userRepository;
+    UserProducer userProducer;
     UserMapper userMapper;
 
     @Transactional
@@ -35,6 +39,12 @@ public class UserService {
         var user = userMapper.toEntity(request);
 
         var savedUser = userRepository.save(user);
+
+        log.error("flag");
+        var event = userMapper.toEvent(savedUser);
+        userProducer.sendUserCreated(event);
+        log.error("flag");
+
         return savedUser.getId();
     }
 

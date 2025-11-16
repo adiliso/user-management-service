@@ -4,6 +4,7 @@ import com.adil.usermanagementservice.domain.entity.UserEntity;
 import com.adil.usermanagementservice.domain.model.dto.request.UserCreateRequest;
 import com.adil.usermanagementservice.domain.model.dto.request.UserUpdateRequest;
 import com.adil.usermanagementservice.domain.model.dto.response.UserResponse;
+import com.adil.usermanagementservice.kafka.event.UserEvent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -26,4 +27,8 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void update(@MappingTarget UserEntity userEntity, UserUpdateRequest request);
+
+    @Mapping(target = "timestamp", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    UserEvent toEvent(UserEntity savedUser);
 }
