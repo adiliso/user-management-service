@@ -32,7 +32,7 @@ public class UserService {
     UserMapper userMapper;
 
     @Transactional
-    public Long create(UserCreateRequest request) {
+    public UserResponse create(UserCreateRequest request) {
         log.info("Creating user... email={}", request.email());
 
         checkEmailAlreadyExists(request.email());
@@ -46,17 +46,17 @@ public class UserService {
         var event = userMapper.toEvent(savedUser);
         userProducer.sendUserCreated(event);
 
-        return savedUser.getId();
+        return userMapper.toResponse(savedUser);
     }
 
     private void checkPhoneAlreadyExists(String phone) {
-        if (userRepository.existsByPhone(phone)) {
+        if (phone != null && userRepository.existsByPhone(phone)) {
             throw new PhoneAlreadyExistsException(phone);
         }
     }
 
     private void checkEmailAlreadyExists(String email) {
-        if (userRepository.existsByEmail(email)) {
+        if (email != null && userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException(email);
         }
     }
@@ -98,9 +98,15 @@ public class UserService {
 
         var userEntity = findById(id);
 
-        userMapper.update(userEntity, request);
-        log.info("User updated successfully id={}", id);
+        checkEmailAlreadyExists(request.email());
+        checkPhoneAlreadyExists(request.phone());
 
+        userMapper.update(userEntity, request);
+
+        var event = userMapper.toEvent(userEntity);
+        userProducer.sendUserUpdated(event);
+
+        log.info("User updated successfully id={}", id);
         return userMapper.toResponse(userEntity);
     }
 
@@ -108,15 +114,13 @@ public class UserService {
     public void deleteById(Long id) {
         log.info("Deleting user id={}", id);
 
-        checkUserExists(id);
+        var userEntity = findById(id);
+
         userRepository.deleteById(id);
 
-        log.info("User deleted id={}", id);
-    }
+        var event = userMapper.toEvent(userEntity);
+        userProducer.sendUserUpdated(event);
 
-    private void checkUserExists(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
+        log.info("User deleted id={}", id);
     }
 }
