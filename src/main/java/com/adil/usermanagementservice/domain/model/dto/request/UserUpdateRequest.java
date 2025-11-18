@@ -5,7 +5,9 @@ import com.adil.usermanagementservice.exception.InvalidUpdateRequestException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record UserUpdateRequest(
 
         @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
