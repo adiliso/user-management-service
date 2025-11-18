@@ -35,10 +35,14 @@ spring:
       user-updated: ${KAFKA_TOPIC_USER_UPDATED:user.updated}
       user-deleted: ${KAFKA_TOPIC_USER_DELETED:user.deleted}
 
-  logging:
-    level:
-      root: ${LOG_LEVEL:INFO}
-      com.adil.usermanagementservice: ${LOG_LEVEL:DEBUG}
-      org.springframework.web: DEBUG
-      org.apache.kafka: ${KAFKA_LOG_LEVEL:WARN}
-      org.springframework.kafka: ${KAFKA_LOG_LEVEL:WARN}
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.adil.usermanagementservice: ${LOG_LEVEL:DEBUG}
+    org.springframework.web: DEBUG
+    org.apache.kafka: ${KAFKA_LOG_LEVEL:WARN}
+    org.springframework.kafka: ${KAFKA_LOG_LEVEL:WARN}
+
+server:
+  address: 0.0.0.0
+  port: 8080

@@ -33,17 +33,18 @@ public class UserService {
 
     @Transactional
     public Long create(UserCreateRequest request) {
+        log.info("Creating user... email={}", request.email());
+
         checkEmailAlreadyExists(request.email());
         checkPhoneAlreadyExists(request.phone());
 
         var user = userMapper.toEntity(request);
 
         var savedUser = userRepository.save(user);
+        log.info("User saved in DB. id={}", savedUser.getId());
 
-        log.error("flag");
         var event = userMapper.toEvent(savedUser);
         userProducer.sendUserCreated(event);
-        log.error("flag");
 
         return savedUser.getId();
     }
@@ -61,8 +62,9 @@ public class UserService {
     }
 
     public UserResponse getById(Long id) {
-        var user = findById(id);
+        log.error("Fetching user by id={}", id);
 
+        var user = findById(id);
         return userMapper.toResponse(user);
     }
 
@@ -72,32 +74,44 @@ public class UserService {
     }
 
     public PageResponse<UserResponse> getAll(int pageNumber, int pageSize) {
+        log.info("Fetching all users... page={}, size={}", pageNumber, pageSize);
+
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         var responses = userRepository.findAll(pageable)
                 .map(userMapper::toResponse);
+
+        log.info("Fetched {} users from page={}", responses.getContent().size(), pageNumber);
 
         return new PageResponse<>(
                 responses.getContent(),
                 pageNumber,
                 pageSize,
                 responses.getTotalElements(),
-                responses.getTotalPages());
+                responses.getTotalPages()
+        );
     }
 
     @Transactional
     public UserResponse update(Long id, UserUpdateRequest request) {
+        log.info("Updating user id={}", id);
+
         var userEntity = findById(id);
 
         userMapper.update(userEntity, request);
+        log.info("User updated successfully id={}", id);
 
         return userMapper.toResponse(userEntity);
     }
 
     @Transactional
     public void deleteById(Long id) {
+        log.info("Deleting user id={}", id);
+
         checkUserExists(id);
         userRepository.deleteById(id);
+
+        log.info("User deleted id={}", id);
     }
 
     private void checkUserExists(Long id) {

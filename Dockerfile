@@ -2,7 +2,7 @@
 FROM gradle:8.7-jdk21 AS build
 WORKDIR /app
 COPY . .
-RUN #gradle build -x test
+RUN gradle build -x test
 
 # Stage 2:
 FROM eclipse-temurin:21-jre-alpine
